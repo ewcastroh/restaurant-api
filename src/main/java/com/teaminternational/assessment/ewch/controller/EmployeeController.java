@@ -1,5 +1,6 @@
 package com.teaminternational.assessment.ewch.controller;
 
+import com.teaminternational.assessment.ewch.exception.EmployeeNotAbleToWorkException;
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
 import com.teaminternational.assessment.ewch.model.dto.EmployeeDto;
 import com.teaminternational.assessment.ewch.service.IEmployeeService;
@@ -91,14 +92,21 @@ public class EmployeeController {
         }
         try {
             newEmployeeDto = employeeService.createEmployee(employeeDto);
-        } catch (DataIntegrityViolationException dive) {
+        } catch (EmployeeNotAbleToWorkException enae) {
+            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
+            response.put(Constants.EMPLOYEE, employeeDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (DataAccessException dive) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-        } catch (DataAccessException dae) {
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            response.put(Constants.EMPLOYEE, employeeDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            response.put(Constants.EMPLOYEE, employeeDto);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_CREATING_EMPLOYEE);
         response.put(Constants.EMPLOYEE, newEmployeeDto);
@@ -132,14 +140,15 @@ public class EmployeeController {
             response.put(Constants.EMPLOYEE, deletedEmployee);
             LOGGER.info("Deleted employee. [{}]", currentEmployeeDto);
         } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID);
+            response.put(Constants.ERROR, ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_DELETING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }

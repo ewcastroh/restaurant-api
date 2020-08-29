@@ -7,7 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -19,8 +20,8 @@ public class EmployeeDto implements Serializable {
     private Long id;
     private String name;
     private String username;
-    private Date dateOfBirth;
-    private Date hireDate;
+    private LocalDate dateOfBirth;
+    private LocalDate hireDate;
     private String area;
     private String jobTitle;
     private String country;

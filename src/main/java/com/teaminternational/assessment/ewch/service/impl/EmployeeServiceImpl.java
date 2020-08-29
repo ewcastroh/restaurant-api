@@ -1,10 +1,12 @@
 package com.teaminternational.assessment.ewch.service.impl;
 
+import com.teaminternational.assessment.ewch.exception.EmployeeNotAbleToWorkException;
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
 import com.teaminternational.assessment.ewch.model.dto.EmployeeDto;
 import com.teaminternational.assessment.ewch.model.entity.Employee;
 import com.teaminternational.assessment.ewch.repository.IEmployeeDao;
 import com.teaminternational.assessment.ewch.service.IEmployeeService;
+import com.teaminternational.assessment.ewch.utils.DateUtils;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,8 +91,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
         EmployeeDto newEmployeeDto = null;
 
         try {
+            if (!DateUtils.isAbleToWork(employeeDto.getDateOfBirth())) {
+                throw new EmployeeNotAbleToWorkException(ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
+            }
             newEmployee = employeeDao.save(modelMapper.map(employeeDto, Employee.class));
             newEmployeeDto = modelMapper.map(newEmployee, EmployeeDto.class);
+        } catch (EmployeeNotAbleToWorkException enae) {
+            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
+            throw new EmployeeNotAbleToWorkException(ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
         } catch (DataIntegrityViolationException dive) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
             throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);

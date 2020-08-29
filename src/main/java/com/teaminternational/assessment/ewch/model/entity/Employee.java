@@ -1,11 +1,13 @@
 package com.teaminternational.assessment.ewch.model.entity;
 
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -27,14 +29,12 @@ public class Employee {
     private String username;
 
     @Column(name = "date_of_birth", nullable = false)
-    @Temporal(TemporalType.DATE)
     @NotEmpty(message = ErrorMessages.DATE_OF_BIRTH_NOT_EMPTY)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(name = "hire_date", nullable = false)
-    @Temporal(TemporalType.DATE)
     @NotEmpty(message = ErrorMessages.HIRE_DATE_NOT_EMPTY)
-    private Date hireDate;
+    private LocalDate hireDate;
 
     @Column(name = "area", nullable = false)
     @NotEmpty(message = ErrorMessages.AREA_NOT_EMPTY)

@@ -19,6 +19,7 @@ public class ErrorMessages {
     public static final String EMPLOYEE_NOT_FOUND_WITH_ID = "Employee not found with id: ";
     public static final String EMPLOYEE_NOT_FOUND_WITH_USERNAME = "Employee not found with username: ";
     public static final String ERROR_CREATING_EMPLOYEE = "Error creating employee.";
+    public static final String ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK = "Error creating employee. New employee should be 18 years old or higher.";
     public static final String ERROR_UPDATING_EMPLOYEE = "Error updating employee.";
     public static final String ERROR_UPDATING_EMPLOYEE_WITH_ID = "Error, it couldn't update employee. It doesn't exist in the database!";
     public static final String ERROR_DELETING_EMPLOYEE = "Error deleting employee.";
