@@ -55,7 +55,7 @@ public class CountryServiceImpl implements ICountryService {
     public CountryDto findCountryById(Long id) {
         LOGGER.info("Getting country by id :: findCountryById");
         Country country = countryDao.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString())));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString())));
         LOGGER.info("Returning country by id. [{}]", country);
         return modelMapper.map(country, CountryDto.class);
     }
@@ -65,7 +65,7 @@ public class CountryServiceImpl implements ICountryService {
     public CountryDto findCountryByName(String username) {
         LOGGER.info("Getting country by name :: findCountryByName");
         Country country = countryDao.findCountryByName(username)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME.concat(username)));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND_WITH_USERNAME.concat(username)));
         LOGGER.info("Returning country by name. [{}]", country);
         return modelMapper.map(country, CountryDto.class);
     }
@@ -81,14 +81,14 @@ public class CountryServiceImpl implements ICountryService {
             newCountry = countryDao.save(modelMapper.map(countryDto, Country.class));
             newCountryDto = modelMapper.map(newCountry, CountryDto.class);
         } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY);
+            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_COUNTRY);
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY, dae);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_COUNTRY);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_COUNTRY);
         }
         LOGGER.info("New created country. [{}]", newCountryDto);
         return newCountryDto;
@@ -101,7 +101,7 @@ public class CountryServiceImpl implements ICountryService {
         CountryDto updatedCountry;
         CountryDto currentCountry = findCountryById(id);
         if (currentCountry == null) {
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            throw new ResourceNotFoundException(ErrorMessages.ERROR_UPDATING_COUNTRY_WITH_ID.concat(id.toString()));
         }
         try {
             currentCountry.setName(countryDto.getName());
@@ -109,14 +109,14 @@ public class CountryServiceImpl implements ICountryService {
             currentCountry.setThreeCharCode(countryDto.getThreeCharCode());
             updatedCountry = createCountry(currentCountry);
         } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY);
+            throw new DataIntegrityViolationException(ErrorMessages.ERROR_UPDATING_COUNTRY);
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY, dae);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_COUNTRY);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_COUNTRY);
         }
         LOGGER.info("Updated country. [{}]", updatedCountry);
         return updatedCountry;
@@ -135,14 +135,14 @@ public class CountryServiceImpl implements ICountryService {
                 LOGGER.info("Deleted country. [{}]", currentCountry.get());
             }
         } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            LOGGER.error(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
+            throw new ResourceNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_COUNTRY);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_COUNTRY);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_COUNTRY, e);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_COUNTRY);
         }
         return deletedCountry;
     }

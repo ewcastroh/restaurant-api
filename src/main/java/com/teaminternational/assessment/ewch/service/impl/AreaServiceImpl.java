@@ -56,7 +56,7 @@ public class AreaServiceImpl implements IAreaService {
     public AreaDto findAreaById(Long id) {
         LOGGER.info("Getting area by id :: findAreaById");
         Area area = areaDao.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString())));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString())));
         LOGGER.info("Returning area by id. [{}]", area);
         return modelMapper.map(area, AreaDto.class);
     }
@@ -66,7 +66,7 @@ public class AreaServiceImpl implements IAreaService {
     public AreaDto findAreaByName(String name) {
         LOGGER.info("Getting area by name :: findAreaByName");
         Area area = areaDao.findAreaByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME.concat(name)));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.AREA_NOT_FOUND_WITH_USERNAME.concat(name)));
         LOGGER.info("Returning area by name. [{}]", area);
         return modelMapper.map(area, AreaDto.class);
     }
@@ -82,14 +82,14 @@ public class AreaServiceImpl implements IAreaService {
             newArea = areaDao.save(modelMapper.map(areaDto, Area.class));
             newAreaDto = modelMapper.map(newArea, AreaDto.class);
         } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA);
+            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_AREA);
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA, dae);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
         }
         LOGGER.info("New created area. [{}]", newAreaDto);
         return newAreaDto;
@@ -102,20 +102,20 @@ public class AreaServiceImpl implements IAreaService {
         AreaDto updatedArea;
         AreaDto currentArea = findAreaById(id);
         if (currentArea == null) {
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            throw new ResourceNotFoundException(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString()));
         }
         try {
             currentArea.setName(areaDto.getName());
             updatedArea = createArea(currentArea);
         } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA);
+            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_AREA);
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA, dae);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
         }
         LOGGER.info("Updated area. [{}]", updatedArea);
         return updatedArea;
@@ -134,14 +134,14 @@ public class AreaServiceImpl implements IAreaService {
                 LOGGER.info("Deleted area. [{}]", currentArea.get());
             }
         } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            LOGGER.error(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString()));
+            throw new ResourceNotFoundException(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString()));
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_AREA);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_AREA);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_AREA, e);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_AREA);
         }
         return deletedArea;
     }

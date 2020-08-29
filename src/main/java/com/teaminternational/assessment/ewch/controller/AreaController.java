@@ -92,16 +92,16 @@ public class AreaController {
         try {
             newAreaDto = areaService.createArea(areaDto);
         } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA);
+            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_AREA);
         } catch (DataAccessException dae) {
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
         }
-        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_CREATING_EMPLOYEE);
-        response.put(Constants.EMPLOYEE, newAreaDto);
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_CREATING_AREA);
+        response.put(Constants.AREA, newAreaDto);
         LOGGER.info("New created area. [{}]", newAreaDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -114,8 +114,8 @@ public class AreaController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         AreaDto updatedArea = areaService.updateArea(areaDto, id);
-        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_EMPLOYEE);
-        response.put(Constants.EMPLOYEE, updatedArea);
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_AREA);
+        response.put(Constants.AREA, updatedArea);
         LOGGER.info("Updated area. [{}]", updatedArea);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -128,18 +128,18 @@ public class AreaController {
         try {
             AreaDto currentAreaDto = areaService.findAreaById(id);
             AreaDto deletedArea = areaService.deleteArea(currentAreaDto.getId());
-            response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_EMPLOYEE);
-            response.put(Constants.EMPLOYEE, deletedArea);
+            response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_AREA);
+            response.put(Constants.AREA, deletedArea);
             LOGGER.info("Deleted area. [{}]", currentAreaDto);
         } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            LOGGER.error(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString()));
+            throw new ResourceNotFoundException(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString()));
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_AREA);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_AREA);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_AREA, e);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_AREA);
         }
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }

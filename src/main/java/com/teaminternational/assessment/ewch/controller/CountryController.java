@@ -92,16 +92,16 @@ public class CountryController {
         try {
             newCountryDto = countryService.createCountry(countryDto);
         } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY);
+            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_COUNTRY);
         } catch (DataAccessException dae) {
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_COUNTRY);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_COUNTRY);
         }
-        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_CREATING_EMPLOYEE);
-        response.put(Constants.EMPLOYEE, newCountryDto);
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_CREATING_COUNTRY);
+        response.put(Constants.COUNTRY, newCountryDto);
         LOGGER.info("New created country. [{}]", newCountryDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -114,8 +114,8 @@ public class CountryController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         CountryDto updatedCountry = countryService.updateCountry(countryDto, id);
-        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_EMPLOYEE);
-        response.put(Constants.EMPLOYEE, updatedCountry);
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_COUNTRY);
+        response.put(Constants.COUNTRY, updatedCountry);
         LOGGER.info("Updated country. [{}]", updatedCountry);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -128,18 +128,18 @@ public class CountryController {
         try {
             CountryDto currentCountryDto = countryService.findCountryById(id);
             CountryDto deletedCountry = countryService.deleteCountry(currentCountryDto.getId());
-            response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_EMPLOYEE);
-            response.put(Constants.EMPLOYEE, deletedCountry);
+            response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_COUNTRY);
+            response.put(Constants.COUNTRY, deletedCountry);
             LOGGER.info("Deleted country. [{}]", currentCountryDto);
         } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            LOGGER.error(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
+            throw new ResourceNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_COUNTRY);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_COUNTRY);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_COUNTRY, e);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_COUNTRY);
         }
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
