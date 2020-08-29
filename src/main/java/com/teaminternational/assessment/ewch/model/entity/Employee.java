@@ -40,7 +40,7 @@ public class Employee {
     @NotEmpty(message = ErrorMessages.AREA_NOT_EMPTY)
     private String area;
 
-    @Column(name = "jobTitle")
+    @Column(name = "job_title")
     @NotEmpty(message = ErrorMessages.JOB_TITLE_NOT_EMPTY)
     private String jobTitle;
 

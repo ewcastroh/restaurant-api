@@ -10,6 +10,8 @@ public class ErrorMessages {
 
     public static final String USERNAME_NOT_EMPTY = "Username cannot be null or empty.";
 
+    public static final String USERNAME_ALREADY_IN_USE = "Username is already in use.";
+
     public static final String DATE_OF_BIRTH_NOT_EMPTY = "Date of birth cannot be null or empty.";
 
     public static final String HIRE_DATE_NOT_EMPTY = "Hire date cannot be null or empty.";
