@@ -6,6 +6,21 @@ INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title
 INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title, country, status, tip_rate) VALUES ('Devin Hawes', 'dhawes', '1977-10-02', '2020-07-13', 'Kitchen', 'Dishwasher', 'Germany', false, 0.0);
 INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title, country, status, tip_rate) VALUES ('Arman Kirby', 'akirby', '1990-10-17', '2019-11-19', 'Services', 'Host', 'Canada', true, 0.0);
 
+/* Creating areas */
+INSERT INTO areas (id, name) VALUES (1, 'Services');
+INSERT INTO areas (id, name) VALUES (2, 'Kitchen');
+
+/* Creating job titles */
+INSERT INTO job_titles (area_id, name) VALUES (1, 'Manager');
+INSERT INTO job_titles (area_id, name) VALUES (1, 'Host');
+INSERT INTO job_titles (area_id, name) VALUES (1, 'Tuttofare');
+INSERT INTO job_titles (area_id, name) VALUES (1, 'Waitress');
+INSERT INTO job_titles (area_id, name) VALUES (1, 'Dining room manager');
+INSERT INTO job_titles (area_id, name) VALUES (2, 'Chef');
+INSERT INTO job_titles (area_id, name) VALUES (2, 'Sous Chef');
+INSERT INTO job_titles (area_id, name) VALUES (2, 'Dishwasher');
+INSERT INTO job_titles (area_id, name) VALUES (2, 'Cook');
+
 /* Creating countries */
 INSERT INTO countries (name, two_char_code, three_char_code) VALUES ('Afghanistan','AF','AFG')
 INSERT INTO countries (name, two_char_code, three_char_code) VALUES('Aland Islands','AX','ALA')

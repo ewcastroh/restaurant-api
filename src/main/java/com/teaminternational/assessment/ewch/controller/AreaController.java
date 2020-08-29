@@ -1,8 +1,8 @@
 package com.teaminternational.assessment.ewch.controller;
 
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
-import com.teaminternational.assessment.ewch.model.dto.EmployeeDto;
-import com.teaminternational.assessment.ewch.service.IEmployeeService;
+import com.teaminternational.assessment.ewch.model.dto.AreaDto;
+import com.teaminternational.assessment.ewch.service.IAreaService;
 import com.teaminternational.assessment.ewch.utils.Constants;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
 import com.teaminternational.assessment.ewch.utils.Validations;
@@ -27,70 +27,70 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/employees")
-public class EmployeeController {
+@RequestMapping("/api/v1/areas")
+public class AreaController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AreaController.class);
 
-    private final IEmployeeService employeeService;
+    private final IAreaService areaService;
 
     @Autowired
-    public EmployeeController(IEmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public AreaController(IAreaService areaService) {
+        this.areaService = areaService;
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EmployeeDto>> findAllEmployees() {
-        LOGGER.info("[EmployeeController]: Getting all employees :: findAllEmployees");
-        List<EmployeeDto> employees = employeeService.findAllEmployees();
-        LOGGER.info("[EmployeeController]: Returning all employees.");
-        return new ResponseEntity<>(employees, HttpStatus.OK);
+    public ResponseEntity<List<AreaDto>> findAllAreas() {
+        LOGGER.info("[AreaController]: Getting all areas :: findAllAreas");
+        List<AreaDto> areas = areaService.findAllAreas();
+        LOGGER.info("[AreaController]: Returning all areas.");
+        return new ResponseEntity<>(areas, HttpStatus.OK);
     }
 
     @GetMapping(value = "/page/{page}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<EmployeeDto>> findAllEmployees(@PathVariable Integer page) {
-        LOGGER.info("[EmployeeController]: Getting all employees :: findAllEmployeesPageable");
+    public ResponseEntity<Page<AreaDto>> findAllAreas(@PathVariable Integer page) {
+        LOGGER.info("[AreaController]: Getting all areas :: findAllAreasPageable");
         Pageable pageable = PageRequest.of(page, 3);
-        Page<EmployeeDto> employees = employeeService.findAllEmployees(pageable);
-        LOGGER.info("[EmployeeController]: Returning all Pageable employees.");
-        return new ResponseEntity<>(employees, HttpStatus.OK);
+        Page<AreaDto> areas = areaService.findAllAreas(pageable);
+        LOGGER.info("[AreaController]: Returning all Pageable areas.");
+        return new ResponseEntity<>(areas, HttpStatus.OK);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<EmployeeDto>> findAllEmployeesPageable(Pageable pageable) {
-        LOGGER.info("[EmployeeController]: Getting all employees :: findAllEmployeesPageable");
-        Page<EmployeeDto> employees = employeeService.findAllEmployees(pageable);
-        LOGGER.info("[EmployeeController]: Returning all Pageable employees.");
-        return new ResponseEntity<>(employees, HttpStatus.OK);
+    public ResponseEntity<Page<AreaDto>> findAllAreasPageable(Pageable pageable) {
+        LOGGER.info("[AreaController]: Getting all areas :: findAllAreasPageable");
+        Page<AreaDto> areas = areaService.findAllAreas(pageable);
+        LOGGER.info("[AreaController]: Returning all Pageable areas.");
+        return new ResponseEntity<>(areas, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeDto> findEmployeeById(@PathVariable Long id) {
-        LOGGER.info("[EmployeeController]: Getting employee by id :: findEmployeeById");
-        EmployeeDto employeeDto = employeeService.findEmployeeById(id);
-        LOGGER.info("[EmployeeController]: Returning employee by id.");
-        return new ResponseEntity<>(employeeDto, HttpStatus.OK);
+    public ResponseEntity<AreaDto> findAreaById(@PathVariable Long id) {
+        LOGGER.info("[AreaController]: Getting area by id :: findAreaById");
+        AreaDto areaDto = areaService.findAreaById(id);
+        LOGGER.info("[AreaController]: Returning area by id.");
+        return new ResponseEntity<>(areaDto, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeDto> findEmployeeByUsername(@PathVariable String username) {
-        LOGGER.info("[EmployeeController]: Getting employee by username :: findEmployeeByUsername");
-        EmployeeDto employeeDto  = employeeService.findEmployeeByUsername(username);
-        LOGGER.info("[EmployeeController]: Returning employee by username.");
-        return new ResponseEntity<>(employeeDto, HttpStatus.OK);
+    @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AreaDto> findAreaByName(@PathVariable String name) {
+        LOGGER.info("[AreaController]: Getting area by name :: findAreaByUsername");
+        AreaDto areaDto  = areaService.findAreaByName(name);
+        LOGGER.info("[AreaController]: Returning area by name.");
+        return new ResponseEntity<>(areaDto, HttpStatus.OK);
     }
 
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> createEmployee(@Valid @RequestBody EmployeeDto employeeDto, BindingResult result) {
-        LOGGER.info("[EmployeeController]: Creating new employee :: createEmployee");
-        EmployeeDto newEmployeeDto;
+    public ResponseEntity<Map<String, Object>> createArea(@Valid @RequestBody AreaDto areaDto, BindingResult result) {
+        LOGGER.info("[AreaController]: Creating new area :: createArea");
+        AreaDto newAreaDto;
         Map<String, Object> response = new HashMap<>();
 
         if (Validations.checkHasErrors(result, response)) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         try {
-            newEmployeeDto = employeeService.createEmployee(employeeDto);
+            newAreaDto = areaService.createArea(areaDto);
         } catch (DataIntegrityViolationException dive) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
             throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
@@ -101,36 +101,36 @@ public class EmployeeController {
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
         }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_CREATING_EMPLOYEE);
-        response.put(Constants.EMPLOYEE, newEmployeeDto);
-        LOGGER.info("New created employee. [{}]", newEmployeeDto);
+        response.put(Constants.EMPLOYEE, newAreaDto);
+        LOGGER.info("New created area. [{}]", newAreaDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> updateEmployee(@Valid @RequestBody EmployeeDto employeeDto, BindingResult result, @PathVariable Long id) {
-        LOGGER.info("[EmployeeController]: Updating employee :: updateEmployee");
+    public ResponseEntity<Map<String, Object>> updateArea(@Valid @RequestBody AreaDto areaDto, BindingResult result, @PathVariable Long id) {
+        LOGGER.info("[AreaController]: Updating area :: updateArea");
         Map<String, Object> response = new HashMap<>();
         if (Validations.checkHasErrors(result, response)) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        EmployeeDto updatedEmployee = employeeService.updateEmployee(employeeDto, id);
+        AreaDto updatedArea = areaService.updateArea(areaDto, id);
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_EMPLOYEE);
-        response.put(Constants.EMPLOYEE, updatedEmployee);
-        LOGGER.info("Updated employee. [{}]", updatedEmployee);
+        response.put(Constants.EMPLOYEE, updatedArea);
+        LOGGER.info("Updated area. [{}]", updatedArea);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Map<String, Object>> deleteEmployee(@PathVariable Long id) {
-        LOGGER.info("[EmployeeController]: Deleting employee :: deleteEmployee");
+    public ResponseEntity<Map<String, Object>> deleteArea(@PathVariable Long id) {
+        LOGGER.info("[AreaController]: Deleting area :: deleteArea");
         Map<String, Object> response = new HashMap<>();
         try {
-            EmployeeDto currentEmployeeDto = employeeService.findEmployeeById(id);
-            EmployeeDto deletedEmployee = employeeService.deleteEmployee(currentEmployeeDto.getId());
+            AreaDto currentAreaDto = areaService.findAreaById(id);
+            AreaDto deletedArea = areaService.deleteArea(currentAreaDto.getId());
             response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_EMPLOYEE);
-            response.put(Constants.EMPLOYEE, deletedEmployee);
-            LOGGER.info("Deleted employee. [{}]", currentEmployeeDto);
+            response.put(Constants.EMPLOYEE, deletedArea);
+            LOGGER.info("Deleted area. [{}]", currentAreaDto);
         } catch (ResourceNotFoundException nfe) {
             LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
             throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));

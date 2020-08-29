@@ -20,5 +20,7 @@ public interface IEmployeeService {
 
     EmployeeDto createEmployee(EmployeeDto employeeDto);
 
+    EmployeeDto updateEmployee(EmployeeDto employeeDto, Long id);
+
     EmployeeDto deleteEmployee(Long id);
 }

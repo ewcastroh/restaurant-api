@@ -109,30 +109,11 @@ public class CountryController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> updateCountry(@Valid @RequestBody CountryDto countryDto, BindingResult result, @PathVariable Long id) {
         LOGGER.info("[CountryController]: Updating country :: updateCountry");
-        CountryDto updatedCountry = null;
-        CountryDto currentCountry = countryService.findCountryById(id);
         Map<String, Object> response = new HashMap<>();
-
         if (Validations.checkHasErrors(result, response)) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        if (currentCountry == null) {
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
-        }
-        try {
-            currentCountry.setName(countryDto.getName());
-            currentCountry.setTwoCharCode(countryDto.getTwoCharCode());
-            currentCountry.setThreeCharCode(countryDto.getThreeCharCode());
-            updatedCountry = countryService.createCountry(currentCountry);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.USERNAME_ALREADY_IN_USE);
-            throw new DataIntegrityViolationException(ErrorMessages.USERNAME_ALREADY_IN_USE + countryDto.getName());
-        } catch (DataAccessException dae) {
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_EMPLOYEE_WITH_ID.concat(id.toString()));
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_UPDATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_EMPLOYEE_WITH_ID.concat(id.toString()));
-        }
+        CountryDto updatedCountry = countryService.updateCountry(countryDto, id);
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_EMPLOYEE);
         response.put(Constants.EMPLOYEE, updatedCountry);
         LOGGER.info("Updated country. [{}]", updatedCountry);

@@ -1,10 +1,11 @@
 package com.teaminternational.assessment.ewch.service.impl;
 
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
-import com.teaminternational.assessment.ewch.model.dto.CountryDto;
-import com.teaminternational.assessment.ewch.model.entity.Country;
-import com.teaminternational.assessment.ewch.repository.ICountryDao;
-import com.teaminternational.assessment.ewch.service.ICountryService;
+import com.teaminternational.assessment.ewch.model.dto.AreaDto;
+import com.teaminternational.assessment.ewch.model.dto.AreaDto;
+import com.teaminternational.assessment.ewch.model.entity.Area;
+import com.teaminternational.assessment.ewch.repository.IAreaDao;
+import com.teaminternational.assessment.ewch.service.IAreaService;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -22,64 +23,64 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CountryServiceImpl implements ICountryService {
+public class AreaServiceImpl implements IAreaService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CountryServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AreaServiceImpl.class);
 
-    private final ICountryDao countryDao;
+    private final IAreaDao areaDao;
     private final ModelMapper modelMapper;
 
-    public CountryServiceImpl(ICountryDao countryDao, ModelMapper modelMapper) {
-        this.countryDao = countryDao;
+    public AreaServiceImpl(IAreaDao areaDao, ModelMapper modelMapper) {
+        this.areaDao = areaDao;
         this.modelMapper = modelMapper;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CountryDto> findAllCountries() {
-        LOGGER.info("Getting all countries :: findAllCountries");
-        return countryDao.findAll().stream()
-                .map(country -> modelMapper.map(country, CountryDto.class)).collect(Collectors.toList());
+    public List<AreaDto> findAllAreas() {
+        LOGGER.info("Getting all areas :: findAllAreas");
+        return areaDao.findAll().stream()
+                .map(area -> modelMapper.map(area, AreaDto.class)).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<CountryDto> findAllCountries(Pageable pageable) {
-        LOGGER.info("Getting all countries :: findAllCountries Pageable");
-        return countryDao.findAll(pageable)
-                .map(country -> modelMapper.map(country, CountryDto.class));
+    public Page<AreaDto> findAllAreas(Pageable pageable) {
+        LOGGER.info("Getting all areas :: findAllAreas Pageable");
+        return areaDao.findAll(pageable)
+                .map(area -> modelMapper.map(area, AreaDto.class));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CountryDto findCountryById(Long id) {
-        LOGGER.info("Getting country by id :: findCountryById");
-        Country country = countryDao.findById(id)
+    public AreaDto findAreaById(Long id) {
+        LOGGER.info("Getting area by id :: findAreaById");
+        Area area = areaDao.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString())));
-        LOGGER.info("Returning country by id. [{}]", country);
-        return modelMapper.map(country, CountryDto.class);
+        LOGGER.info("Returning area by id. [{}]", area);
+        return modelMapper.map(area, AreaDto.class);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CountryDto findCountryByName(String username) {
-        LOGGER.info("Getting country by name :: findCountryByName");
-        Country country = countryDao.findCountryByName(username)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME.concat(username)));
-        LOGGER.info("Returning country by name. [{}]", country);
-        return modelMapper.map(country, CountryDto.class);
+    public AreaDto findAreaByName(String name) {
+        LOGGER.info("Getting area by name :: findAreaByName");
+        Area area = areaDao.findAreaByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME.concat(name)));
+        LOGGER.info("Returning area by name. [{}]", area);
+        return modelMapper.map(area, AreaDto.class);
     }
 
     @Override
     @Transactional
-    public CountryDto createCountry(CountryDto countryDto) {
-        LOGGER.info("Creating new country :: createCountry");
-        Country newCountry;
-        CountryDto newCountryDto = null;
+    public AreaDto createArea(AreaDto areaDto) {
+        LOGGER.info("Creating new area :: createArea");
+        Area newArea;
+        AreaDto newAreaDto = null;
 
         try {
-            newCountry = countryDao.save(modelMapper.map(countryDto, Country.class));
-            newCountryDto = modelMapper.map(newCountry, CountryDto.class);
+            newArea = areaDao.save(modelMapper.map(areaDto, Area.class));
+            newAreaDto = modelMapper.map(newArea, AreaDto.class);
         } catch (DataIntegrityViolationException dive) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
             throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
@@ -90,24 +91,22 @@ public class CountryServiceImpl implements ICountryService {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
         }
-        LOGGER.info("New created country. [{}]", newCountryDto);
-        return newCountryDto;
+        LOGGER.info("New created area. [{}]", newAreaDto);
+        return newAreaDto;
     }
 
     @Override
     @Transactional
-    public CountryDto updateCountry(CountryDto countryDto, Long id) {
-        LOGGER.info("Updating country :: updateCountry");
-        CountryDto updatedCountry;
-        CountryDto currentCountry = findCountryById(id);
-        if (currentCountry == null) {
+    public AreaDto updateArea(AreaDto areaDto, Long id) {
+        LOGGER.info("Updating area :: updateArea");
+        AreaDto updatedArea;
+        AreaDto currentArea = findAreaById(id);
+        if (currentArea == null) {
             throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
         }
         try {
-            currentCountry.setName(countryDto.getName());
-            currentCountry.setTwoCharCode(countryDto.getTwoCharCode());
-            currentCountry.setThreeCharCode(countryDto.getThreeCharCode());
-            updatedCountry = createCountry(currentCountry);
+            currentArea.setName(areaDto.getName());
+            updatedArea = createArea(currentArea);
         } catch (DataIntegrityViolationException dive) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
             throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
@@ -118,21 +117,21 @@ public class CountryServiceImpl implements ICountryService {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
         }
-        LOGGER.info("Updated country. [{}]", updatedCountry);
-        return updatedCountry;
+        LOGGER.info("Updated area. [{}]", updatedArea);
+        return updatedArea;
     }
 
     @Override
     @Transactional
-    public CountryDto deleteCountry(Long id) {
-        LOGGER.info("Deleting country :: deleteCountry");
-        CountryDto deletedCountry = null;
+    public AreaDto deleteArea(Long id) {
+        LOGGER.info("Deleting area :: deleteArea");
+        AreaDto deletedArea = null;
         try {
-            Optional<Country> currentCountry = countryDao.findById(id);
-            if (currentCountry.isPresent()) {
-                countryDao.delete(currentCountry.get());
-                deletedCountry = modelMapper.map(currentCountry.get(), CountryDto.class);
-                LOGGER.info("Deleted country. [{}]", currentCountry.get());
+            Optional<Area> currentArea = areaDao.findById(id);
+            if (currentArea.isPresent()) {
+                areaDao.delete(currentArea.get());
+                deletedArea = modelMapper.map(currentArea.get(), AreaDto.class);
+                LOGGER.info("Deleted area. [{}]", currentArea.get());
             }
         } catch (ResourceNotFoundException nfe) {
             LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
@@ -144,6 +143,6 @@ public class CountryServiceImpl implements ICountryService {
             LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
         }
-        return deletedCountry;
+        return deletedArea;
     }
 }

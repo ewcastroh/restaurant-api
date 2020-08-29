@@ -18,6 +18,8 @@ public interface ICountryService {
 
     CountryDto createCountry(CountryDto countryDto);
 
+    CountryDto updateCountry(CountryDto countryDto, Long id);
+
     CountryDto deleteCountry(Long id);
 
 }
