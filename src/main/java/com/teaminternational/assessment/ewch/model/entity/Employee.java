@@ -18,11 +18,11 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     @NotEmpty(message = ErrorMessages.NAME_NOT_EMPTY)
     private String name;
 
-    @Column(name = "username", unique = true)
+    @Column(name = "username", unique = true, nullable = false)
     @NotEmpty(message = ErrorMessages.USERNAME_NOT_EMPTY)
     private String username;
 
