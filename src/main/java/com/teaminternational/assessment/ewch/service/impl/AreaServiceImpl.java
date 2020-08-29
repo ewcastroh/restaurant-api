@@ -2,7 +2,6 @@ package com.teaminternational.assessment.ewch.service.impl;
 
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
 import com.teaminternational.assessment.ewch.model.dto.AreaDto;
-import com.teaminternational.assessment.ewch.model.dto.AreaDto;
 import com.teaminternational.assessment.ewch.model.entity.Area;
 import com.teaminternational.assessment.ewch.repository.IAreaDao;
 import com.teaminternational.assessment.ewch.service.IAreaService;
