@@ -50,7 +50,7 @@ public class EmployeeController {
     @GetMapping(value = "/page/{page}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<EmployeeDto>> findAllEmployees(@PathVariable Integer page) {
         LOGGER.info("[EmployeeController]: Getting all employees :: findAllEmployeesPageable");
-        Pageable pageable = PageRequest.of(page, 2);
+        Pageable pageable = PageRequest.of(page, 3);
         Page<EmployeeDto> employees = employeeService.findAllEmployees(pageable);
         LOGGER.info("[EmployeeController]: Returning all Pageable employees.");
         return new ResponseEntity<>(employees, HttpStatus.OK);
@@ -124,6 +124,7 @@ public class EmployeeController {
 
         try {
             currentEmployee.setName(employeeDto.getName());
+            currentEmployee.setUsername(employeeDto.getUsername());
             currentEmployee.setDateOfBirth(employeeDto.getDateOfBirth());
             currentEmployee.setHireDate(employeeDto.getHireDate());
             currentEmployee.setArea(employeeDto.getArea());
