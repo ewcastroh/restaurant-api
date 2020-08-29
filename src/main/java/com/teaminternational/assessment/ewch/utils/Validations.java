@@ -16,7 +16,6 @@ public final class Validations {
             List<String> errors = result.getFieldErrors()
                     .stream()
                     .map(err -> "Field '" + err.getField() + "' " + err.getDefaultMessage())
-                    .peek(e -> System.err.println(e))
                     .collect(Collectors.toList());
             response.put(Constants.ERROR, errors);
             return true;

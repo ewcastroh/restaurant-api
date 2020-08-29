@@ -74,9 +74,9 @@ public class EmployeeController {
 
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EmployeeDto> findEmployeeByUsername(@PathVariable String username) {
-        LOGGER.info("[EmployeeController]: Getting employee by email :: findEmployeeByEmail");
+        LOGGER.info("[EmployeeController]: Getting employee by username :: findEmployeeByUsername");
         EmployeeDto employeeDto  = employeeService.findEmployeeByUsername(username);
-        LOGGER.info("[EmployeeController]: Returning employee by email.");
+        LOGGER.info("[EmployeeController]: Returning employee by username.");
         return new ResponseEntity<>(employeeDto, HttpStatus.OK);
     }
 
@@ -87,11 +87,8 @@ public class EmployeeController {
         Map<String, Object> response = new HashMap<>();
 
         if (Validations.checkHasErrors(result, response)) {
-            System.err.println("Result:" + result.toString());
-            System.err.println("Result:" + response);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-
         try {
             newEmployeeDto = employeeService.createEmployee(employeeDto);
         } catch (DataIntegrityViolationException dive) {
@@ -116,12 +113,12 @@ public class EmployeeController {
         EmployeeDto currentEmployee = employeeService.findEmployeeById(id);
         Map<String, Object> response = new HashMap<>();
 
-        if (Validations.checkHasErrors(result, response)) return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-
-        if (currentEmployee == null) {
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID + id);
+        if (Validations.checkHasErrors(result, response)) {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-
+        if (currentEmployee == null) {
+            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+        }
         try {
             currentEmployee.setName(employeeDto.getName());
             currentEmployee.setUsername(employeeDto.getUsername());
@@ -137,10 +134,10 @@ public class EmployeeController {
             LOGGER.error(ErrorMessages.USERNAME_ALREADY_IN_USE);
             throw new DataIntegrityViolationException(ErrorMessages.USERNAME_ALREADY_IN_USE + employeeDto.getUsername());
         } catch (DataAccessException dae) {
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_EMPLOYEE_WITH_ID + id);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_EMPLOYEE_WITH_ID.concat(id.toString()));
         } catch (Exception e) {
             LOGGER.error(ErrorMessages.ERROR_UPDATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_EMPLOYEE_WITH_ID + id);
+            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_EMPLOYEE_WITH_ID.concat(id.toString()));
         }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_EMPLOYEE);
         response.put(Constants.EMPLOYEE, updatedEmployee);
@@ -160,13 +157,13 @@ public class EmployeeController {
             response.put(Constants.EMPLOYEE, deletedEmployee);
             LOGGER.info("Deleted employee. [{}]", currentEmployeeDto);
         } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID, id.toString());
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID + id.toString());
+            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
         } catch (DataAccessException dae) {
             LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE + "{0}", e);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
         }
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);

@@ -55,7 +55,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public EmployeeDto findEmployeeById(Long id) {
         LOGGER.info("Getting employee by id :: findEmployeeById");
         Employee employee = employeeDao.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString())));
         LOGGER.info("Returning employee by id. [{}]", employee);
         return modelMapper.map(employee, EmployeeDto.class);
     }
@@ -65,7 +65,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public EmployeeDto findEmployeeByUsername(String username) {
         LOGGER.info("Getting employee by username :: findEmployeeByUsername");
         Employee employee = employeeDao.findEmployeeByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME + username));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME.concat(username)));
         LOGGER.info("Returning employee by username. [{}]", employee);
         return modelMapper.map(employee, EmployeeDto.class);
     }
@@ -73,10 +73,10 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     @Transactional(readOnly = true)
     public EmployeeDto findEmployeeByNameOrUsername(String nameOrUsername) {
-        LOGGER.info("Getting employee by username :: findEmployeeByUsername");
+        LOGGER.info("Getting employee by name or username :: findEmployeeByNameOrUsername");
         Employee employee = employeeDao.findEmployeeByNameOrUsername(nameOrUsername)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME + nameOrUsername));
-        LOGGER.info("Returning employee by username. [{}]", employee);
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME.concat(nameOrUsername)));
+        LOGGER.info("Returning employee by name or username. [{}]", employee);
         return modelMapper.map(employee, EmployeeDto.class);
     }
 
@@ -94,7 +94,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
             throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
         } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE + "{0}", dae);
+            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE, dae);
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
         } catch (Exception e) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
@@ -117,13 +117,13 @@ public class EmployeeServiceImpl implements IEmployeeService {
                 LOGGER.info("Deleted employee. [{}]", currentEmployee.get());
             }
         } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID, id);
+            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
             throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
         } catch (DataAccessException dae) {
             LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE + "{0}", e);
+            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
             throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
         }
         return deletedEmployee;

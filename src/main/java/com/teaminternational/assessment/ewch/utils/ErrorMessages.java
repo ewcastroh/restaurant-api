@@ -24,9 +24,9 @@ public class ErrorMessages {
 
     public static final String STATUS_NOT_EMPTY = "Status cannot be null or empty.";
 
-    public static final String EMPLOYEE_NOT_FOUND_WITH_ID = "Employee not found with id: {0}";
+    public static final String EMPLOYEE_NOT_FOUND_WITH_ID = "Employee not found with id: ";
 
-    public static final String EMPLOYEE_NOT_FOUND_WITH_USERNAME = "Employee not found with username: {0}";
+    public static final String EMPLOYEE_NOT_FOUND_WITH_USERNAME = "Employee not found with username: ";
 
     public static final String ERROR_CREATING_EMPLOYEE = "Error creating employee.";
 
