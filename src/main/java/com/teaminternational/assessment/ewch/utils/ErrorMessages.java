@@ -46,4 +46,14 @@ public class ErrorMessages {
     public static final String SUCCESS_UPDATING_AREA = "Area has been updated successfully!";
     public static final String SUCCESS_DELETED_AREA = "Area has been deleted successfully!";
 
+    public static final String JOB_TITLE_NOT_FOUND_WITH_ID = "Job title not found with id: ";
+    public static final String JOB_TITLE_NOT_FOUND_WITH_USERNAME = "Job title not found with username: ";
+    public static final String ERROR_CREATING_JOB_TITLE = "Error creating country.";
+    public static final String ERROR_UPDATING_JOB_TITLE = "Error updating country.";
+    public static final String ERROR_UPDATING_JOB_TITLE_WITH_ID = "Error, it couldn't update country. It doesn't exist in the database!";
+    public static final String ERROR_DELETING_JOB_TITLE = "Error deleting country.";
+    public static final String SUCCESS_CREATING_JOB_TITLE = "Job title has been created successfully!";
+    public static final String SUCCESS_UPDATING_JOB_TITLE = "Job title has been updated successfully!";
+    public static final String SUCCESS_DELETED_JOB_TITLE = "Job title has been deleted successfully!";
+
 }
