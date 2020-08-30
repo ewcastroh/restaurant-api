@@ -3,6 +3,7 @@ package com.teaminternational.assessment.ewch.utils;
 import com.teaminternational.assessment.ewch.exception.EmployeeNotAbleToWorkException;
 import com.teaminternational.assessment.ewch.exception.FieldIsNullOrEmptyException;
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
+import com.teaminternational.assessment.ewch.model.dto.AreaDto;
 import com.teaminternational.assessment.ewch.model.dto.CountryDto;
 import com.teaminternational.assessment.ewch.model.dto.EmployeeDto;
 import lombok.AccessLevel;
@@ -70,6 +71,15 @@ public final class Validations {
         }
         if (countryDto.getThreeCharCode() == null || countryDto.getThreeCharCode().isBlank()) {
             throw new FieldIsNullOrEmptyException(ErrorMessages.COUNTRY_THREE_CHAR_CODE_EMPTY);
+        }
+    }
+
+    public static void validateFieldsAreaDto(AreaDto areaDto) {
+        if (areaDto == null) {
+            throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND);
+        }
+        if (areaDto.getName() == null || areaDto.getName().isBlank()) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.NAME_NOT_EMPTY);
         }
     }
 }

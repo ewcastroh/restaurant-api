@@ -91,8 +91,8 @@ public class EmployeeController {
         try {
             employeeDto = employeeService.findEmployeeByUsername(username);
         } catch (ResourceNotFoundException rnfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(username));
-            response.put(Constants.ERROR, ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(username));
+            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME.concat(username));
+            response.put(Constants.ERROR, ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_USERNAME.concat(username));
             response.put(Constants.EMPLOYEE, null);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }

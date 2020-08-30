@@ -73,7 +73,7 @@ public class CountryController {
         } catch (ResourceNotFoundException rnfe) {
             LOGGER.error(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID);
             response.put(Constants.ERROR, ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID);
-            response.put(Constants.EMPLOYEE, null);
+            response.put(Constants.AREA, null);
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_GETTING_COUNTRY);
@@ -96,7 +96,7 @@ public class CountryController {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_GETTING_COUNTRY);
-        response.put(Constants.EMPLOYEE, countryDto);
+        response.put(Constants.AREA, countryDto);
         LOGGER.info("[CountryController]: Returning country by name.");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -193,7 +193,7 @@ public class CountryController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_COUNTRY);
-        response.put(Constants.EMPLOYEE, currentCountryDto);
+        response.put(Constants.AREA, currentCountryDto);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 

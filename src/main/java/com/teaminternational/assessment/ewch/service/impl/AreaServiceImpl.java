@@ -6,6 +6,7 @@ import com.teaminternational.assessment.ewch.model.entity.Area;
 import com.teaminternational.assessment.ewch.repository.IAreaDao;
 import com.teaminternational.assessment.ewch.service.IAreaService;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
+import com.teaminternational.assessment.ewch.utils.Validations;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,21 +76,10 @@ public class AreaServiceImpl implements IAreaService {
     public AreaDto createArea(AreaDto areaDto) {
         LOGGER.info("Creating new area :: createArea");
         Area newArea;
-        AreaDto newAreaDto = null;
-
-        try {
-            newArea = areaDao.save(modelMapper.map(areaDto, Area.class));
-            newAreaDto = modelMapper.map(newArea, AreaDto.class);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_AREA);
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
-        }
+        AreaDto newAreaDto;
+        Validations.validateFieldsAreaDto(areaDto);
+        newArea = areaDao.save(modelMapper.map(areaDto, Area.class));
+        newAreaDto = modelMapper.map(newArea, AreaDto.class);
         LOGGER.info("New created area. [{}]", newAreaDto);
         return newAreaDto;
     }
@@ -100,22 +90,10 @@ public class AreaServiceImpl implements IAreaService {
         LOGGER.info("Updating area :: updateArea");
         AreaDto updatedArea;
         AreaDto currentArea = findAreaById(id);
-        if (currentArea == null) {
-            throw new ResourceNotFoundException(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString()));
-        }
-        try {
-            currentArea.setName(areaDto.getName());
-            updatedArea = createArea(currentArea);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_AREA);
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_AREA.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_AREA);
-        }
+        Validations.validateFieldsAreaDto(areaDto);
+        Validations.validateFieldsAreaDto(currentArea);
+        currentArea.setName(areaDto.getName());
+        updatedArea = createArea(currentArea);
         LOGGER.info("Updated area. [{}]", updatedArea);
         return updatedArea;
     }
@@ -125,22 +103,11 @@ public class AreaServiceImpl implements IAreaService {
     public AreaDto deleteArea(Long id) {
         LOGGER.info("Deleting area :: deleteArea");
         AreaDto deletedArea = null;
-        try {
-            Optional<Area> currentArea = areaDao.findById(id);
-            if (currentArea.isPresent()) {
-                areaDao.delete(currentArea.get());
-                deletedArea = modelMapper.map(currentArea.get(), AreaDto.class);
-                LOGGER.info("Deleted area. [{}]", currentArea.get());
-            }
-        } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.AREA_NOT_FOUND_WITH_ID.concat(id.toString()));
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_AREA);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_AREA);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_AREA, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_AREA);
+        Optional<Area> currentArea = areaDao.findById(id);
+        if (currentArea.isPresent()) {
+            areaDao.delete(currentArea.get());
+            deletedArea = modelMapper.map(currentArea.get(), AreaDto.class);
+            LOGGER.info("Deleted area. [{}]", currentArea.get());
         }
         return deletedArea;
     }

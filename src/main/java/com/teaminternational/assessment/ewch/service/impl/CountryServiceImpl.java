@@ -63,7 +63,7 @@ public class CountryServiceImpl implements ICountryService {
     public CountryDto findCountryByName(String username) {
         LOGGER.info("Getting country by name :: findCountryByName");
         Country country = countryDao.findCountryByName(username)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND_WITH_USERNAME.concat(username)));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND_WITH_NAME.concat(username)));
         LOGGER.info("Returning country by name. [{}]", country);
         return modelMapper.map(country, CountryDto.class);
     }

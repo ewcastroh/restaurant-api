@@ -32,7 +32,7 @@ public class ErrorMessages {
     public static final String SUCCESS_DELETED_EMPLOYEE = "Employee has been deleted successfully!";
 
     public static final String COUNTRY_NOT_FOUND_WITH_ID = "Country not found with id: ";
-    public static final String COUNTRY_NOT_FOUND_WITH_USERNAME = "Country not found with username: ";
+    public static final String COUNTRY_NOT_FOUND_WITH_NAME = "Country not found with name: ";
     public static final String ERROR_CREATING_COUNTRY = "Error creating country.";
     public static final String ERROR_UPDATING_COUNTRY = "Error updating country.";
     public static final String ERROR_UPDATING_COUNTRY_WITH_ID = "Error, it couldn't update country. It doesn't exist in the database!";
@@ -48,6 +48,7 @@ public class ErrorMessages {
     public static final String ERROR_UPDATING_AREA = "Error updating country.";
     public static final String ERROR_UPDATING_AREA_WITH_ID = "Error, it couldn't update country. It doesn't exist in the database!";
     public static final String ERROR_DELETING_AREA = "Error deleting country.";
+    public static final String SUCCESS_GETTING_AREA = "Area has been gotten successfully!";
     public static final String SUCCESS_CREATING_AREA = "Area has been created successfully!";
     public static final String SUCCESS_UPDATING_AREA = "Area has been updated successfully!";
     public static final String SUCCESS_DELETED_AREA = "Area has been deleted successfully!";
