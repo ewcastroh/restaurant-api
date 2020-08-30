@@ -1,6 +1,7 @@
 package com.teaminternational.assessment.ewch.controller;
 
 import com.teaminternational.assessment.ewch.exception.EmployeeNotAbleToWorkException;
+import com.teaminternational.assessment.ewch.exception.FieldIsNullOrEmptyException;
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
 import com.teaminternational.assessment.ewch.model.dto.EmployeeDto;
 import com.teaminternational.assessment.ewch.service.IEmployeeService;
@@ -64,19 +65,41 @@ public class EmployeeController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeDto> findEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> findEmployeeById(@PathVariable Long id) {
         LOGGER.info("[EmployeeController]: Getting employee by id :: findEmployeeById");
-        EmployeeDto employeeDto = employeeService.findEmployeeById(id);
+        EmployeeDto employeeDto;
+        Map<String, Object> response = new HashMap<>();
+        try {
+            employeeDto = employeeService.findEmployeeById(id);
+        } catch (ResourceNotFoundException rnfe) {
+            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID);
+            response.put(Constants.ERROR, ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID);
+            response.put(Constants.EMPLOYEE, null);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_GETTING_EMPLOYEE);
+        response.put(Constants.EMPLOYEE, employeeDto);
         LOGGER.info("[EmployeeController]: Returning employee by id.");
-        return new ResponseEntity<>(employeeDto, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeDto> findEmployeeByUsername(@PathVariable String username) {
+    public ResponseEntity<Map<String, Object>> findEmployeeByUsername(@PathVariable String username) {
         LOGGER.info("[EmployeeController]: Getting employee by username :: findEmployeeByUsername");
-        EmployeeDto employeeDto  = employeeService.findEmployeeByUsername(username);
+        EmployeeDto employeeDto;
+        Map<String, Object> response = new HashMap<>();
+        try {
+            employeeDto  = employeeService.findEmployeeByUsername(username);
+        } catch (ResourceNotFoundException rnfe) {
+            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(username));
+            response.put(Constants.ERROR, ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(username));
+            response.put(Constants.EMPLOYEE, null);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_GETTING_EMPLOYEE);
+        response.put(Constants.EMPLOYEE, employeeDto);
         LOGGER.info("[EmployeeController]: Returning employee by username.");
-        return new ResponseEntity<>(employeeDto, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,15 +107,19 @@ public class EmployeeController {
         LOGGER.info("[EmployeeController]: Creating new employee :: createEmployee");
         EmployeeDto newEmployeeDto;
         Map<String, Object> response = new HashMap<>();
-
         if (Validations.checkHasErrors(result, response)) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         try {
             newEmployeeDto = employeeService.createEmployee(employeeDto);
         } catch (EmployeeNotAbleToWorkException enae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
-            response.put(Constants.ERROR, ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
+            LOGGER.error(ErrorMessages.ERROR_EMPLOYEE_NOT_ABLE_TO_WORK);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_EMPLOYEE_NOT_ABLE_TO_WORK);
+            response.put(Constants.EMPLOYEE, employeeDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (FieldIsNullOrEmptyException finoee) {
+            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
+            response.put(Constants.ERROR, finoee.getMessage());
             response.put(Constants.EMPLOYEE, employeeDto);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (DataAccessException dive) {
@@ -115,11 +142,34 @@ public class EmployeeController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> updateEmployee(@Valid @RequestBody EmployeeDto employeeDto, BindingResult result, @PathVariable Long id) {
         LOGGER.info("[EmployeeController]: Updating employee :: updateEmployee");
+        EmployeeDto updatedEmployee;
         Map<String, Object> response = new HashMap<>();
         if (Validations.checkHasErrors(result, response)) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        EmployeeDto updatedEmployee = employeeService.updateEmployee(employeeDto, id);
+        try {
+            updatedEmployee = employeeService.updateEmployee(employeeDto, id);
+        } catch (EmployeeNotAbleToWorkException enae) {
+            LOGGER.error(ErrorMessages.ERROR_EMPLOYEE_NOT_ABLE_TO_WORK);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_EMPLOYEE_NOT_ABLE_TO_WORK);
+            response.put(Constants.EMPLOYEE, employeeDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (FieldIsNullOrEmptyException finoee) {
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_EMPLOYEE);
+            response.put(Constants.ERROR, finoee.getMessage());
+            response.put(Constants.EMPLOYEE, employeeDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (DataAccessException dive) {
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_EMPLOYEE);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_UPDATING_EMPLOYEE);
+            response.put(Constants.EMPLOYEE, employeeDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            response.put(Constants.ERROR, ErrorMessages.ERROR_UPDATING_EMPLOYEE);
+            response.put(Constants.EMPLOYEE, employeeDto);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_EMPLOYEE);
         response.put(Constants.EMPLOYEE, updatedEmployee);
         LOGGER.info("Updated employee. [{}]", updatedEmployee);
@@ -130,24 +180,31 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Map<String, Object>> deleteEmployee(@PathVariable Long id) {
         LOGGER.info("[EmployeeController]: Deleting employee :: deleteEmployee");
+        EmployeeDto currentEmployeeDto;
+        EmployeeDto deletedEmployee;
         Map<String, Object> response = new HashMap<>();
         try {
-            EmployeeDto currentEmployeeDto = employeeService.findEmployeeById(id);
-            EmployeeDto deletedEmployee = employeeService.deleteEmployee(currentEmployeeDto.getId());
+            currentEmployeeDto = employeeService.findEmployeeById(id);
+            deletedEmployee = employeeService.deleteEmployee(currentEmployeeDto.getId());
             response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_EMPLOYEE);
             response.put(Constants.EMPLOYEE, deletedEmployee);
             LOGGER.info("Deleted employee. [{}]", currentEmployeeDto);
         } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID);
+            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
             response.put(Constants.ERROR, ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
+            response.put(Constants.EMPLOYEE, null);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (DataAccessException dae) {
+            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
             response.put(Constants.ERROR, ErrorMessages.ERROR_DELETING_EMPLOYEE);
+            response.put(Constants.EMPLOYEE, null);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             response.put(Constants.ERROR, ErrorMessages.ERROR_DELETING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_EMPLOYEE);
+        response.put(Constants.EMPLOYEE, currentEmployeeDto);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 

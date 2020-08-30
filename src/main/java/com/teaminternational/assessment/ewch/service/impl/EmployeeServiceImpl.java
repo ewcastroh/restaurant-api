@@ -1,6 +1,7 @@
 package com.teaminternational.assessment.ewch.service.impl;
 
 import com.teaminternational.assessment.ewch.exception.EmployeeNotAbleToWorkException;
+import com.teaminternational.assessment.ewch.exception.FieldIsNullOrEmptyException;
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
 import com.teaminternational.assessment.ewch.model.dto.EmployeeDto;
 import com.teaminternational.assessment.ewch.model.entity.Employee;
@@ -12,7 +13,6 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -88,26 +88,9 @@ public class EmployeeServiceImpl implements IEmployeeService {
         LOGGER.info("Creating new employee :: createEmployee");
         Employee newEmployee;
         EmployeeDto newEmployeeDto = null;
-
-        try {
-            if (!DateUtils.isAbleToWork(employeeDto.getDateOfBirth())) {
-                throw new EmployeeNotAbleToWorkException(ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
-            }
-            newEmployee = employeeDao.save(modelMapper.map(employeeDto, Employee.class));
-            newEmployeeDto = modelMapper.map(newEmployee, EmployeeDto.class);
-        } catch (EmployeeNotAbleToWorkException enae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
-            throw new EmployeeNotAbleToWorkException(ErrorMessages.ERROR_CREATING_EMPLOYEE_NOT_ABLE_TO_WORK);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_EMPLOYEE);
-        }
+        validateFieldsEmployeeDto(employeeDto);
+        newEmployee = employeeDao.save(modelMapper.map(employeeDto, Employee.class));
+        newEmployeeDto = modelMapper.map(newEmployee, EmployeeDto.class);
         LOGGER.info("New created employee. [{}]", newEmployeeDto);
         return newEmployeeDto;
     }
@@ -118,33 +101,21 @@ public class EmployeeServiceImpl implements IEmployeeService {
         LOGGER.info("Updating employee :: updateEmployee");
         EmployeeDto updatedEmployee;
         EmployeeDto currentEmployee = findEmployeeById(id);
-        if (currentEmployee == null) {
-            throw new ResourceNotFoundException(ErrorMessages.ERROR_UPDATING_EMPLOYEE_WITH_ID.concat(id.toString()));
-        }
-        try {
-            currentEmployee.setName(employeeDto.getName());
-            currentEmployee.setUsername(employeeDto.getUsername());
-            currentEmployee.setDateOfBirth(employeeDto.getDateOfBirth());
-            currentEmployee.setHireDate(employeeDto.getHireDate());
-            currentEmployee.setAreaId(employeeDto.getAreaId());
-            currentEmployee.setAreaName(employeeDto.getAreaName());
-            currentEmployee.setJobTitleId(employeeDto.getJobTitleId());
-            currentEmployee.setJobTitleName(employeeDto.getJobTitleName());
-            currentEmployee.setCountryId(employeeDto.getCountryId());
-            currentEmployee.setCountryName(employeeDto.getCountryName());
-            currentEmployee.setStatus(employeeDto.getStatus());
-            currentEmployee.setTipRate(employeeDto.getTipRate());
-            updatedEmployee = createEmployee(currentEmployee);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_UPDATING_EMPLOYEE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_UPDATING_EMPLOYEE);
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_UPDATING_EMPLOYEE, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_EMPLOYEE);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_UPDATING_EMPLOYEE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_EMPLOYEE);
-        }
+        validateFieldsEmployeeDto(employeeDto);
+        validateFieldsEmployeeDto(currentEmployee);
+        currentEmployee.setName(employeeDto.getName());
+        currentEmployee.setUsername(employeeDto.getUsername());
+        currentEmployee.setDateOfBirth(employeeDto.getDateOfBirth());
+        currentEmployee.setHireDate(employeeDto.getHireDate());
+        currentEmployee.setAreaId(employeeDto.getAreaId());
+        currentEmployee.setAreaName(employeeDto.getAreaName());
+        currentEmployee.setJobTitleId(employeeDto.getJobTitleId());
+        currentEmployee.setJobTitleName(employeeDto.getJobTitleName());
+        currentEmployee.setCountryId(employeeDto.getCountryId());
+        currentEmployee.setCountryName(employeeDto.getCountryName());
+        currentEmployee.setStatus(employeeDto.getStatus());
+        currentEmployee.setTipRate(employeeDto.getTipRate());
+        updatedEmployee = createEmployee(currentEmployee);
         LOGGER.info("Updated employee. [{}]", updatedEmployee);
         return updatedEmployee;
     }
@@ -154,23 +125,43 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public EmployeeDto deleteEmployee(Long id) {
         LOGGER.info("Deleting employee :: deleteEmployee");
         EmployeeDto deletedEmployee = null;
-        try {
-            Optional<Employee> currentEmployee = employeeDao.findById(id);
-            if (currentEmployee.isPresent()) {
-                employeeDao.delete(currentEmployee.get());
-                deletedEmployee = modelMapper.map(currentEmployee.get(), EmployeeDto.class);
-                LOGGER.info("Deleted employee. [{}]", currentEmployee.get());
-            }
-        } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(id.toString()));
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_EMPLOYEE, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_EMPLOYEE);
+        Optional<Employee> currentEmployee = employeeDao.findById(id);
+        if (currentEmployee.isPresent()) {
+            employeeDao.delete(currentEmployee.get());
+            deletedEmployee = modelMapper.map(currentEmployee.get(), EmployeeDto.class);
+            LOGGER.info("Deleted employee. [{}]", currentEmployee.get());
         }
         return deletedEmployee;
     }
+
+    private void validateFieldsEmployeeDto(EmployeeDto employeeDto) {
+        if (employeeDto == null) {
+            throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND);
+        }
+        if (!DateUtils.isAbleToWork(employeeDto.getDateOfBirth())) {
+            throw new EmployeeNotAbleToWorkException(ErrorMessages.ERROR_EMPLOYEE_NOT_ABLE_TO_WORK);
+        }
+        if (employeeDto.getName() == null || employeeDto.getName().isBlank()) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.NAME_NOT_EMPTY);
+        }
+        if (employeeDto.getUsername() == null || employeeDto.getUsername().isBlank()) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.USERNAME_NOT_EMPTY);
+        }
+        if (employeeDto.getDateOfBirth() == null) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.DATE_OF_BIRTH_NOT_EMPTY);
+        }
+        if (employeeDto.getHireDate() == null) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.HIRE_DATE_NOT_EMPTY);
+        }
+        if (employeeDto.getJobTitleId() == null) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.JOB_TITLE_NOT_EMPTY);
+        }
+        if (employeeDto.getCountryId() == null) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.COUNTRY_NOT_EMPTY);
+        }
+        if (employeeDto.getStatus() == null) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.STATUS_NOT_EMPTY);
+        }
+    }
+
 }
