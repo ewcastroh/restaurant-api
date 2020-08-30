@@ -89,7 +89,7 @@ public class EmployeeController {
         EmployeeDto employeeDto;
         Map<String, Object> response = new HashMap<>();
         try {
-            employeeDto  = employeeService.findEmployeeByUsername(username);
+            employeeDto = employeeService.findEmployeeByUsername(username);
         } catch (ResourceNotFoundException rnfe) {
             LOGGER.error(ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(username));
             response.put(Constants.ERROR, ErrorMessages.EMPLOYEE_NOT_FOUND_WITH_ID.concat(username));

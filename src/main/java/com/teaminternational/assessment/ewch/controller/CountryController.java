@@ -1,5 +1,6 @@
 package com.teaminternational.assessment.ewch.controller;
 
+import com.teaminternational.assessment.ewch.exception.FieldIsNullOrEmptyException;
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
 import com.teaminternational.assessment.ewch.model.dto.CountryDto;
 import com.teaminternational.assessment.ewch.service.ICountryService;
@@ -10,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -65,19 +64,41 @@ public class CountryController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CountryDto> findCountryById(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> findCountryById(@PathVariable Long id) {
         LOGGER.info("[CountryController]: Getting country by id :: findCountryById");
-        CountryDto countryDto = countryService.findCountryById(id);
+        CountryDto countryDto;
+        Map<String, Object> response = new HashMap<>();
+        try {
+            countryDto = countryService.findCountryById(id);
+        } catch (ResourceNotFoundException rnfe) {
+            LOGGER.error(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID);
+            response.put(Constants.ERROR, ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID);
+            response.put(Constants.EMPLOYEE, null);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_GETTING_COUNTRY);
+        response.put(Constants.COUNTRY, countryDto);
         LOGGER.info("[CountryController]: Returning country by id.");
-        return new ResponseEntity<>(countryDto, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CountryDto> findCountryByName(@PathVariable String name) {
+    public ResponseEntity<Map<String, Object>> findCountryByName(@PathVariable String name) {
         LOGGER.info("[CountryController]: Getting country by name :: findCountryByUsername");
-        CountryDto countryDto  = countryService.findCountryByName(name);
+        CountryDto countryDto;
+        Map<String, Object> response = new HashMap<>();
+        try {
+            countryDto = countryService.findCountryByName(name);
+        } catch (ResourceNotFoundException rnfe) {
+            LOGGER.error(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(name));
+            response.put(Constants.ERROR, ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(name));
+            response.put(Constants.COUNTRY, null);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_GETTING_COUNTRY);
+        response.put(Constants.EMPLOYEE, countryDto);
         LOGGER.info("[CountryController]: Returning country by name.");
-        return new ResponseEntity<>(countryDto, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,20 +106,26 @@ public class CountryController {
         LOGGER.info("[CountryController]: Creating new country :: createCountry");
         CountryDto newCountryDto;
         Map<String, Object> response = new HashMap<>();
-
         if (Validations.checkHasErrors(result, response)) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         try {
             newCountryDto = countryService.createCountry(countryDto);
-        } catch (DataIntegrityViolationException dive) {
+        } catch (FieldIsNullOrEmptyException finoee) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_COUNTRY);
-        } catch (DataAccessException dae) {
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_COUNTRY);
+            response.put(Constants.ERROR, finoee.getMessage());
+            response.put(Constants.COUNTRY, countryDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (DataAccessException dive) {
+            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_CREATING_COUNTRY);
+            response.put(Constants.COUNTRY, countryDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_COUNTRY);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_CREATING_COUNTRY);
+            response.put(Constants.COUNTRY, countryDto);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_CREATING_COUNTRY);
         response.put(Constants.COUNTRY, newCountryDto);
@@ -109,11 +136,29 @@ public class CountryController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> updateCountry(@Valid @RequestBody CountryDto countryDto, BindingResult result, @PathVariable Long id) {
         LOGGER.info("[CountryController]: Updating country :: updateCountry");
+        CountryDto updatedCountry;
         Map<String, Object> response = new HashMap<>();
         if (Validations.checkHasErrors(result, response)) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        CountryDto updatedCountry = countryService.updateCountry(countryDto, id);
+        try {
+            updatedCountry = countryService.updateCountry(countryDto, id);
+        } catch (FieldIsNullOrEmptyException finoee) {
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY);
+            response.put(Constants.ERROR, finoee.getMessage());
+            response.put(Constants.COUNTRY, countryDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (DataAccessException dive) {
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_UPDATING_COUNTRY);
+            response.put(Constants.COUNTRY, countryDto);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            response.put(Constants.ERROR, ErrorMessages.ERROR_UPDATING_COUNTRY);
+            response.put(Constants.COUNTRY, countryDto);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_UPDATING_COUNTRY);
         response.put(Constants.COUNTRY, updatedCountry);
         LOGGER.info("Updated country. [{}]", updatedCountry);
@@ -124,23 +169,31 @@ public class CountryController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Map<String, Object>> deleteCountry(@PathVariable Long id) {
         LOGGER.info("[CountryController]: Deleting country :: deleteCountry");
+        CountryDto currentCountryDto;
+        CountryDto deletedCountry;
         Map<String, Object> response = new HashMap<>();
         try {
-            CountryDto currentCountryDto = countryService.findCountryById(id);
-            CountryDto deletedCountry = countryService.deleteCountry(currentCountryDto.getId());
+            currentCountryDto = countryService.findCountryById(id);
+            deletedCountry = countryService.deleteCountry(currentCountryDto.getId());
             response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_COUNTRY);
             response.put(Constants.COUNTRY, deletedCountry);
             LOGGER.info("Deleted country. [{}]", currentCountryDto);
         } catch (ResourceNotFoundException nfe) {
             LOGGER.error(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
+            response.put(Constants.ERROR, ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
+            response.put(Constants.COUNTRY, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (DataAccessException dae) {
             LOGGER.error(ErrorMessages.ERROR_DELETING_COUNTRY);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_COUNTRY);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_DELETING_COUNTRY);
+            response.put(Constants.COUNTRY, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_COUNTRY, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_COUNTRY);
+            response.put(Constants.ERROR, ErrorMessages.ERROR_DELETING_COUNTRY.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        response.put(Constants.MESSAGE, ErrorMessages.SUCCESS_DELETED_COUNTRY);
+        response.put(Constants.EMPLOYEE, currentCountryDto);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 

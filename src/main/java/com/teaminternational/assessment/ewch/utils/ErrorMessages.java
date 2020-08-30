@@ -15,6 +15,8 @@ public class ErrorMessages {
     public static final String AREA_NOT_EMPTY = "Area cannot be null or empty.";
     public static final String JOB_TITLE_NOT_EMPTY = "Job title cannot be null or empty.";
     public static final String COUNTRY_NOT_EMPTY = "Country cannot be null or empty.";
+    public static final String COUNTRY_TWO_CHAR_CODE_EMPTY = "Country two char code cannot be null or empty.";
+    public static final String COUNTRY_THREE_CHAR_CODE_EMPTY = "Country three char code cannot be null or empty.";
     public static final String STATUS_NOT_EMPTY = "Status cannot be null or empty.";
     public static final String ERROR_EMPLOYEE_NOT_ABLE_TO_WORK = "Employee should be 18 years old or higher.";
 
@@ -35,6 +37,7 @@ public class ErrorMessages {
     public static final String ERROR_UPDATING_COUNTRY = "Error updating country.";
     public static final String ERROR_UPDATING_COUNTRY_WITH_ID = "Error, it couldn't update country. It doesn't exist in the database!";
     public static final String ERROR_DELETING_COUNTRY = "Error deleting country.";
+    public static final String SUCCESS_GETTING_COUNTRY = "Country has been gotten successfully!";
     public static final String SUCCESS_CREATING_COUNTRY = "Country has been created successfully!";
     public static final String SUCCESS_UPDATING_COUNTRY = "Country has been updated successfully!";
     public static final String SUCCESS_DELETED_COUNTRY = "Country has been deleted successfully!";

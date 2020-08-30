@@ -1,19 +1,15 @@
 package com.teaminternational.assessment.ewch.service.impl;
 
-import com.teaminternational.assessment.ewch.exception.EmployeeNotAbleToWorkException;
-import com.teaminternational.assessment.ewch.exception.FieldIsNullOrEmptyException;
 import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException;
 import com.teaminternational.assessment.ewch.model.dto.EmployeeDto;
 import com.teaminternational.assessment.ewch.model.entity.Employee;
 import com.teaminternational.assessment.ewch.repository.IEmployeeDao;
 import com.teaminternational.assessment.ewch.service.IEmployeeService;
-import com.teaminternational.assessment.ewch.utils.DateUtils;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
+import com.teaminternational.assessment.ewch.utils.Validations;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -87,8 +83,8 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
         LOGGER.info("Creating new employee :: createEmployee");
         Employee newEmployee;
-        EmployeeDto newEmployeeDto = null;
-        validateFieldsEmployeeDto(employeeDto);
+        EmployeeDto newEmployeeDto;
+        Validations.validateFieldsEmployeeDto(employeeDto);
         newEmployee = employeeDao.save(modelMapper.map(employeeDto, Employee.class));
         newEmployeeDto = modelMapper.map(newEmployee, EmployeeDto.class);
         LOGGER.info("New created employee. [{}]", newEmployeeDto);
@@ -101,8 +97,8 @@ public class EmployeeServiceImpl implements IEmployeeService {
         LOGGER.info("Updating employee :: updateEmployee");
         EmployeeDto updatedEmployee;
         EmployeeDto currentEmployee = findEmployeeById(id);
-        validateFieldsEmployeeDto(employeeDto);
-        validateFieldsEmployeeDto(currentEmployee);
+        Validations.validateFieldsEmployeeDto(employeeDto);
+        Validations.validateFieldsEmployeeDto(currentEmployee);
         currentEmployee.setName(employeeDto.getName());
         currentEmployee.setUsername(employeeDto.getUsername());
         currentEmployee.setDateOfBirth(employeeDto.getDateOfBirth());
@@ -133,35 +129,4 @@ public class EmployeeServiceImpl implements IEmployeeService {
         }
         return deletedEmployee;
     }
-
-    private void validateFieldsEmployeeDto(EmployeeDto employeeDto) {
-        if (employeeDto == null) {
-            throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND);
-        }
-        if (!DateUtils.isAbleToWork(employeeDto.getDateOfBirth())) {
-            throw new EmployeeNotAbleToWorkException(ErrorMessages.ERROR_EMPLOYEE_NOT_ABLE_TO_WORK);
-        }
-        if (employeeDto.getName() == null || employeeDto.getName().isBlank()) {
-            throw new FieldIsNullOrEmptyException(ErrorMessages.NAME_NOT_EMPTY);
-        }
-        if (employeeDto.getUsername() == null || employeeDto.getUsername().isBlank()) {
-            throw new FieldIsNullOrEmptyException(ErrorMessages.USERNAME_NOT_EMPTY);
-        }
-        if (employeeDto.getDateOfBirth() == null) {
-            throw new FieldIsNullOrEmptyException(ErrorMessages.DATE_OF_BIRTH_NOT_EMPTY);
-        }
-        if (employeeDto.getHireDate() == null) {
-            throw new FieldIsNullOrEmptyException(ErrorMessages.HIRE_DATE_NOT_EMPTY);
-        }
-        if (employeeDto.getJobTitleId() == null) {
-            throw new FieldIsNullOrEmptyException(ErrorMessages.JOB_TITLE_NOT_EMPTY);
-        }
-        if (employeeDto.getCountryId() == null) {
-            throw new FieldIsNullOrEmptyException(ErrorMessages.COUNTRY_NOT_EMPTY);
-        }
-        if (employeeDto.getStatus() == null) {
-            throw new FieldIsNullOrEmptyException(ErrorMessages.STATUS_NOT_EMPTY);
-        }
-    }
-
 }

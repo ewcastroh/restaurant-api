@@ -6,12 +6,10 @@ import com.teaminternational.assessment.ewch.model.entity.Country;
 import com.teaminternational.assessment.ewch.repository.ICountryDao;
 import com.teaminternational.assessment.ewch.service.ICountryService;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
+import com.teaminternational.assessment.ewch.utils.Validations;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -75,21 +73,10 @@ public class CountryServiceImpl implements ICountryService {
     public CountryDto createCountry(CountryDto countryDto) {
         LOGGER.info("Creating new country :: createCountry");
         Country newCountry;
-        CountryDto newCountryDto = null;
-
-        try {
-            newCountry = countryDao.save(modelMapper.map(countryDto, Country.class));
-            newCountryDto = modelMapper.map(newCountry, CountryDto.class);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_COUNTRY);
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_COUNTRY);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_COUNTRY.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_COUNTRY);
-        }
+        CountryDto newCountryDto;
+        Validations.validateFieldsCountryDto(countryDto);
+        newCountry = countryDao.save(modelMapper.map(countryDto, Country.class));
+        newCountryDto = modelMapper.map(newCountry, CountryDto.class);
         LOGGER.info("New created country. [{}]", newCountryDto);
         return newCountryDto;
     }
@@ -100,24 +87,12 @@ public class CountryServiceImpl implements ICountryService {
         LOGGER.info("Updating country :: updateCountry");
         CountryDto updatedCountry;
         CountryDto currentCountry = findCountryById(id);
-        if (currentCountry == null) {
-            throw new ResourceNotFoundException(ErrorMessages.ERROR_UPDATING_COUNTRY_WITH_ID.concat(id.toString()));
-        }
-        try {
-            currentCountry.setName(countryDto.getName());
-            currentCountry.setTwoCharCode(countryDto.getTwoCharCode());
-            currentCountry.setThreeCharCode(countryDto.getThreeCharCode());
-            updatedCountry = createCountry(currentCountry);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_UPDATING_COUNTRY);
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_COUNTRY);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_UPDATING_COUNTRY.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_UPDATING_COUNTRY);
-        }
+        Validations.validateFieldsCountryDto(countryDto);
+        Validations.validateFieldsCountryDto(currentCountry);
+        currentCountry.setName(countryDto.getName());
+        currentCountry.setTwoCharCode(countryDto.getTwoCharCode());
+        currentCountry.setThreeCharCode(countryDto.getThreeCharCode());
+        updatedCountry = createCountry(currentCountry);
         LOGGER.info("Updated country. [{}]", updatedCountry);
         return updatedCountry;
     }
@@ -127,23 +102,13 @@ public class CountryServiceImpl implements ICountryService {
     public CountryDto deleteCountry(Long id) {
         LOGGER.info("Deleting country :: deleteCountry");
         CountryDto deletedCountry = null;
-        try {
-            Optional<Country> currentCountry = countryDao.findById(id);
-            if (currentCountry.isPresent()) {
-                countryDao.delete(currentCountry.get());
-                deletedCountry = modelMapper.map(currentCountry.get(), CountryDto.class);
-                LOGGER.info("Deleted country. [{}]", currentCountry.get());
-            }
-        } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.COUNTRY_NOT_FOUND_WITH_ID.concat(id.toString()));
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_COUNTRY);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_COUNTRY);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_COUNTRY, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_COUNTRY);
+        Optional<Country> currentCountry = countryDao.findById(id);
+        if (currentCountry.isPresent()) {
+            countryDao.delete(currentCountry.get());
+            deletedCountry = modelMapper.map(currentCountry.get(), CountryDto.class);
+            LOGGER.info("Deleted country. [{}]", currentCountry.get());
         }
         return deletedCountry;
     }
+
 }
