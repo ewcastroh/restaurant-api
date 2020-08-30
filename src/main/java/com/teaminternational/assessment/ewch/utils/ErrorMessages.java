@@ -12,7 +12,7 @@ public class ErrorMessages {
     public static final String USERNAME_ALREADY_IN_USE = "Username is already in use.";
     public static final String DATE_OF_BIRTH_NOT_EMPTY = "Date of birth cannot be null or empty.";
     public static final String HIRE_DATE_NOT_EMPTY = "Hire date cannot be null or empty.";
-    public static final String AREA_NOT_EMPTY = "Area cannot be null or empty.";
+    public static final String AREA_NOT_EMPTY = "Area cannot be null, empty or less than zero.";
     public static final String JOB_TITLE_NOT_EMPTY = "Job title cannot be null or empty.";
     public static final String COUNTRY_NOT_EMPTY = "Country cannot be null or empty.";
     public static final String COUNTRY_TWO_CHAR_CODE_EMPTY = "Country two char code cannot be null or empty.";
@@ -59,6 +59,7 @@ public class ErrorMessages {
     public static final String ERROR_UPDATING_JOB_TITLE = "Error updating country.";
     public static final String ERROR_UPDATING_JOB_TITLE_WITH_ID = "Error, it couldn't update country. It doesn't exist in the database!";
     public static final String ERROR_DELETING_JOB_TITLE = "Error deleting country.";
+    public static final String SUCCESS_GETTING_JOB_TITLE = "Job title has been gotten successfully!";
     public static final String SUCCESS_CREATING_JOB_TITLE = "Job title has been created successfully!";
     public static final String SUCCESS_UPDATING_JOB_TITLE = "Job title has been updated successfully!";
     public static final String SUCCESS_DELETED_JOB_TITLE = "Job title has been deleted successfully!";

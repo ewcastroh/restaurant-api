@@ -6,6 +6,7 @@ import com.teaminternational.assessment.ewch.exception.ResourceNotFoundException
 import com.teaminternational.assessment.ewch.model.dto.AreaDto;
 import com.teaminternational.assessment.ewch.model.dto.CountryDto;
 import com.teaminternational.assessment.ewch.model.dto.EmployeeDto;
+import com.teaminternational.assessment.ewch.model.dto.JobTitleDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.BindingResult;
@@ -80,6 +81,18 @@ public final class Validations {
         }
         if (areaDto.getName() == null || areaDto.getName().isBlank()) {
             throw new FieldIsNullOrEmptyException(ErrorMessages.NAME_NOT_EMPTY);
+        }
+    }
+
+    public static void validateFieldsJobTitleDto(JobTitleDto jobTitleDto) {
+        if (jobTitleDto == null) {
+            throw new ResourceNotFoundException(ErrorMessages.RESOURCE_NOT_FOUND);
+        }
+        if (jobTitleDto.getName() == null || jobTitleDto.getName().isBlank()) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.NAME_NOT_EMPTY);
+        }
+        if (jobTitleDto.getAreaId() == null || jobTitleDto.getAreaId() < 0) {
+            throw new FieldIsNullOrEmptyException(ErrorMessages.AREA_NOT_EMPTY);
         }
     }
 }

@@ -6,6 +6,7 @@ import com.teaminternational.assessment.ewch.model.entity.JobTitle;
 import com.teaminternational.assessment.ewch.repository.IJobTitleDao;
 import com.teaminternational.assessment.ewch.service.IJobTitleService;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
+import com.teaminternational.assessment.ewch.utils.Validations;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,21 +76,10 @@ public class JobTitleServiceImpl implements IJobTitleService {
     public JobTitleDto createJobTitle(JobTitleDto jobTitleDto) {
         LOGGER.info("Creating new jobTitle :: createJobTitle");
         JobTitle newJobTitle;
-        JobTitleDto newJobTitleDto = null;
-
-        try {
-            newJobTitle = jobTitleDao.save(modelMapper.map(jobTitleDto, JobTitle.class));
-            newJobTitleDto = modelMapper.map(newJobTitle, JobTitleDto.class);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_JOB_TITLE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_JOB_TITLE);
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_JOB_TITLE, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_JOB_TITLE);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_JOB_TITLE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_JOB_TITLE);
-        }
+        JobTitleDto newJobTitleDto;
+        Validations.validateFieldsJobTitleDto(jobTitleDto);
+        newJobTitle = jobTitleDao.save(modelMapper.map(jobTitleDto, JobTitle.class));
+        newJobTitleDto = modelMapper.map(newJobTitle, JobTitleDto.class);
         LOGGER.info("New created jobTitle. [{}]", newJobTitleDto);
         return newJobTitleDto;
     }
@@ -100,22 +90,10 @@ public class JobTitleServiceImpl implements IJobTitleService {
         LOGGER.info("Updating jobTitle :: updateJobTitle");
         JobTitleDto updatedJobTitle;
         JobTitleDto currentJobTitle = findJobTitleById(id);
-        if (currentJobTitle == null) {
-            throw new ResourceNotFoundException(ErrorMessages.JOB_TITLE_NOT_FOUND_WITH_ID.concat(id.toString()));
-        }
-        try {
-            currentJobTitle.setName(jobTitleDto.getName());
-            updatedJobTitle = createJobTitle(currentJobTitle);
-        } catch (DataIntegrityViolationException dive) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_JOB_TITLE);
-            throw new DataIntegrityViolationException(ErrorMessages.ERROR_CREATING_JOB_TITLE);
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_JOB_TITLE, dae);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_JOB_TITLE);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_CREATING_JOB_TITLE.concat(": ").concat(e.getMessage()).concat(e.getCause().toString()));
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_CREATING_JOB_TITLE);
-        }
+        Validations.validateFieldsJobTitleDto(jobTitleDto);
+        Validations.validateFieldsJobTitleDto(currentJobTitle);
+        currentJobTitle.setName(jobTitleDto.getName());
+        updatedJobTitle = createJobTitle(currentJobTitle);
         LOGGER.info("Updated jobTitle. [{}]", updatedJobTitle);
         return updatedJobTitle;
     }
@@ -125,22 +103,11 @@ public class JobTitleServiceImpl implements IJobTitleService {
     public JobTitleDto deleteJobTitle(Long id) {
         LOGGER.info("Deleting jobTitle :: deleteJobTitle");
         JobTitleDto deletedJobTitle = null;
-        try {
-            Optional<JobTitle> currentJobTitle = jobTitleDao.findById(id);
-            if (currentJobTitle.isPresent()) {
-                jobTitleDao.delete(currentJobTitle.get());
-                deletedJobTitle = modelMapper.map(currentJobTitle.get(), JobTitleDto.class);
-                LOGGER.info("Deleted jobTitle. [{}]", currentJobTitle.get());
-            }
-        } catch (ResourceNotFoundException nfe) {
-            LOGGER.error(ErrorMessages.JOB_TITLE_NOT_FOUND_WITH_ID.concat(id.toString()));
-            throw new ResourceNotFoundException(ErrorMessages.JOB_TITLE_NOT_FOUND_WITH_ID.concat(id.toString()));
-        } catch (DataAccessException dae) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_JOB_TITLE);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_JOB_TITLE);
-        } catch (Exception e) {
-            LOGGER.error(ErrorMessages.ERROR_DELETING_JOB_TITLE, e);
-            throw new RecoverableDataAccessException(ErrorMessages.ERROR_DELETING_JOB_TITLE);
+        Optional<JobTitle> currentJobTitle = jobTitleDao.findById(id);
+        if (currentJobTitle.isPresent()) {
+            jobTitleDao.delete(currentJobTitle.get());
+            deletedJobTitle = modelMapper.map(currentJobTitle.get(), JobTitleDto.class);
+            LOGGER.info("Deleted jobTitle. [{}]", currentJobTitle.get());
         }
         return deletedJobTitle;
     }
