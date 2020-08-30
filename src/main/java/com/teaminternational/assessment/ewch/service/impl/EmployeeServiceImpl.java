@@ -126,9 +126,12 @@ public class EmployeeServiceImpl implements IEmployeeService {
             currentEmployee.setUsername(employeeDto.getUsername());
             currentEmployee.setDateOfBirth(employeeDto.getDateOfBirth());
             currentEmployee.setHireDate(employeeDto.getHireDate());
-            currentEmployee.setArea(employeeDto.getArea());
-            currentEmployee.setJobTitle(employeeDto.getJobTitle());
-            currentEmployee.setCountry(employeeDto.getCountry());
+            currentEmployee.setAreaId(employeeDto.getAreaId());
+            currentEmployee.setAreaName(employeeDto.getAreaName());
+            currentEmployee.setJobTitleId(employeeDto.getJobTitleId());
+            currentEmployee.setJobTitleName(employeeDto.getJobTitleName());
+            currentEmployee.setCountryId(employeeDto.getCountryId());
+            currentEmployee.setCountryName(employeeDto.getCountryName());
             currentEmployee.setStatus(employeeDto.getStatus());
             currentEmployee.setTipRate(employeeDto.getTipRate());
             updatedEmployee = createEmployee(currentEmployee);

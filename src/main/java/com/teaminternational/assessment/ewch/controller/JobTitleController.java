@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/jobTitless")
+@RequestMapping("/api/v1/jobTitles")
 public class JobTitleController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobTitleController.class);
@@ -41,27 +41,27 @@ public class JobTitleController {
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<JobTitleDto>> findAllJobTitles() {
-        LOGGER.info("[JobTitleController]: Getting all jobTitless :: findAllJobTitles");
-        List<JobTitleDto> jobTitless = jobTitlesService.findAllJobTitles();
-        LOGGER.info("[JobTitleController]: Returning all jobTitless.");
-        return new ResponseEntity<>(jobTitless, HttpStatus.OK);
+        LOGGER.info("[JobTitleController]: Getting all jobTitles :: findAllJobTitles");
+        List<JobTitleDto> jobTitles = jobTitlesService.findAllJobTitles();
+        LOGGER.info("[JobTitleController]: Returning all jobTitles.");
+        return new ResponseEntity<>(jobTitles, HttpStatus.OK);
     }
 
     @GetMapping(value = "/page/{page}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<JobTitleDto>> findAllJobTitles(@PathVariable Integer page) {
-        LOGGER.info("[JobTitleController]: Getting all jobTitless :: findAllJobTitlesPageable");
+        LOGGER.info("[JobTitleController]: Getting all jobTitles :: findAllJobTitlesPageable");
         Pageable pageable = PageRequest.of(page, 3);
-        Page<JobTitleDto> jobTitless = jobTitlesService.findAllJobTitles(pageable);
-        LOGGER.info("[JobTitleController]: Returning all Pageable jobTitless.");
-        return new ResponseEntity<>(jobTitless, HttpStatus.OK);
+        Page<JobTitleDto> jobTitles = jobTitlesService.findAllJobTitles(pageable);
+        LOGGER.info("[JobTitleController]: Returning all Pageable jobTitles.");
+        return new ResponseEntity<>(jobTitles, HttpStatus.OK);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<JobTitleDto>> findAllJobTitlesPageable(Pageable pageable) {
-        LOGGER.info("[JobTitleController]: Getting all jobTitless :: findAllJobTitlesPageable");
-        Page<JobTitleDto> jobTitless = jobTitlesService.findAllJobTitles(pageable);
-        LOGGER.info("[JobTitleController]: Returning all Pageable jobTitless.");
-        return new ResponseEntity<>(jobTitless, HttpStatus.OK);
+        LOGGER.info("[JobTitleController]: Getting all jobTitles :: findAllJobTitlesPageable");
+        Page<JobTitleDto> jobTitles = jobTitlesService.findAllJobTitles(pageable);
+        LOGGER.info("[JobTitleController]: Returning all Pageable jobTitles.");
+        return new ResponseEntity<>(jobTitles, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

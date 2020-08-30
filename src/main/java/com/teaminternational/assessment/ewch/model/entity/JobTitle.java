@@ -3,13 +3,15 @@ package com.teaminternational.assessment.ewch.model.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -28,4 +30,13 @@ public class JobTitle {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
     private Area area;
+
+    @Override
+    public String toString() {
+        return "JobTitle{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", area=" + area +
+                '}';
+    }
 }

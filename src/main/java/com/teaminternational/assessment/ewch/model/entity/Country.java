@@ -30,4 +30,5 @@ public class Country {
     @Column(name = "three_char_code ", unique = true, nullable = false, length = 3)
     @NotEmpty(message = ErrorMessages.USERNAME_NOT_EMPTY)
     private String threeCharCode;
+
 }

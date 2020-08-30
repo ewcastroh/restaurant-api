@@ -1,5 +1,7 @@
 package com.teaminternational.assessment.ewch.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.teaminternational.assessment.ewch.utils.DateUtils;
 import com.teaminternational.assessment.ewch.utils.ErrorMessages;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,17 +38,17 @@ public class Employee {
     @NotEmpty(message = ErrorMessages.HIRE_DATE_NOT_EMPTY)
     private LocalDate hireDate;
 
-    @Column(name = "area", nullable = false)
-    @NotEmpty(message = ErrorMessages.AREA_NOT_EMPTY)
-    private String area;
-
-    @Column(name = "job_title", nullable = false)
+    @JsonIgnoreProperties(value = {"employees", "hibernateLazyInitializer", "handler"}, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_title_id", nullable = false)
     @NotEmpty(message = ErrorMessages.JOB_TITLE_NOT_EMPTY)
-    private String jobTitle;
+    private JobTitle jobTitle;
 
-    @Column(name = "country", nullable = false)
+    @JsonIgnoreProperties(value = {"employees", "hibernateLazyInitializer", "handler"}, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id", nullable = false)
     @NotEmpty(message = ErrorMessages.COUNTRY_NOT_EMPTY)
-    private String country;
+    private Country country;
 
     @Column(name = "status", nullable = false)
     @NotEmpty(message = ErrorMessages.STATUS_NOT_EMPTY)
@@ -54,5 +56,12 @@ public class Employee {
 
     @Column(name = "tip_rate", nullable = false, columnDefinition="Decimal(10,2) default '0.00'")
     private double tipRate;
+
+    @Transient
+    private int age;
+
+    public int getAge() {
+        return DateUtils.getYearsInstantDifferenceFromNow(this.getDateOfBirth());
+    }
 
 }

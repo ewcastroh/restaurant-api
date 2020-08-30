@@ -1,11 +1,3 @@
-/* Creating employees */
-INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title, country, status, tip_rate) VALUES ('Amit Tait', 'atait', '1969-01-02', '2001-01-28', 'Services', 'Manager', 'India', true, 0.0);
-INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title, country, status, tip_rate) VALUES ('Harleen Duncan', 'hduncan', '1974-05-05', '2010-04-09', 'Services', 'Waitress', 'USA', true, 0.9);
-INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title, country, status, tip_rate) VALUES ('Clinton Alvarez', 'calvarez', '1974-12-09', '2004-04-16', 'Kitchen', 'Chef', 'Colombia', true, 0.0);
-INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title, country, status, tip_rate) VALUES ('Romario Greer', 'rgreer', '1975-05-13', '2008-02-19', 'Kitchen', 'Cook', 'Italy', true, 0.0);
-INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title, country, status, tip_rate) VALUES ('Devin Hawes', 'dhawes', '1977-10-02', '2020-07-13', 'Kitchen', 'Dishwasher', 'Germany', false, 0.0);
-INSERT INTO employees (name, username, date_of_birth, hire_date, area, job_title, country, status, tip_rate) VALUES ('Arman Kirby', 'akirby', '1990-10-17', '2019-11-19', 'Services', 'Host', 'Canada', true, 0.0);
-
 /* Creating areas */
 INSERT INTO areas (id, name) VALUES (1, 'Services');
 INSERT INTO areas (id, name) VALUES (2, 'Kitchen');
@@ -272,3 +264,11 @@ INSERT INTO countries (name, two_char_code, three_char_code) VALUES('Western Sah
 INSERT INTO countries (name, two_char_code, three_char_code) VALUES('Yemen','YE','YEM')
 INSERT INTO countries (name, two_char_code, three_char_code) VALUES('Zambia','ZM','ZMB')
 INSERT INTO countries (name, two_char_code, three_char_code) VALUES('Zimbabwe','ZW','ZWE');
+
+/* Creating employees */
+INSERT INTO employees (name, username, date_of_birth, hire_date, job_title_id, country_id, status, tip_rate) VALUES ('Amit Tait', 'atait', '1969-01-02', '2001-01-28', 1, 123, true, 0.0);
+INSERT INTO employees (name, username, date_of_birth, hire_date, job_title_id, country_id, status, tip_rate) VALUES ('Harleen Duncan', 'hduncan', '1974-05-05', '2010-04-09', 4, 57, true, 0.9);
+INSERT INTO employees (name, username, date_of_birth, hire_date, job_title_id, country_id, status, tip_rate) VALUES ('Clinton Alvarez', 'calvarez', '1974-12-09', '2004-04-16', 6, 13, true, 0.0);
+INSERT INTO employees (name, username, date_of_birth, hire_date, job_title_id, country_id, status, tip_rate) VALUES ('Romario Greer', 'rgreer', '1975-05-13', '2008-02-19', 9, 234, true, 0.0);
+INSERT INTO employees (name, username, date_of_birth, hire_date, job_title_id, country_id, status, tip_rate) VALUES ('Devin Hawes', 'dhawes', '1977-10-02', '2020-07-13', 8, 78, false, 0.0);
+INSERT INTO employees (name, username, date_of_birth, hire_date, job_title_id, country_id, status, tip_rate) VALUES ('Arman Kirby', 'akirby', '1990-10-17', '2019-11-19', 2, 201, true, 0.0);

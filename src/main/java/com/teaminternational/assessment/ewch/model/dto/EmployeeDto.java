@@ -21,9 +21,13 @@ public class EmployeeDto implements Serializable {
     private String username;
     private LocalDate dateOfBirth;
     private LocalDate hireDate;
-    private String area;
-    private String jobTitle;
-    private String country;
+    private Long areaId;
+    private String areaName;
+    private Long jobTitleId;
+    private String jobTitleName;
+    private Long countryId;
+    private String countryName;
     private Boolean status;
     private double tipRate;
+    private int age;
 }
